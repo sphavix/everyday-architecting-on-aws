@@ -22,6 +22,7 @@ const USERS_TABLE = process.env.USERS_TABLE || '';
 const dynamoDb = new DynamoDBClient({});
 const documentClient = DynamoDBDocumentClient.from(dynamoDb);
 
+
 enum UserRoutes {
   CREATE_USER = 'POST /users',
   DELETE_USER = 'DELETE /users/{userid}',

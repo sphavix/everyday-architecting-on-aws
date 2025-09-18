@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
+    "outDir": "dist",
     "lib": [
       "es2020",
       "dom"
@@ -20,8 +21,6 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
     "typeRoots": [
       "./node_modules/@types"
     ]

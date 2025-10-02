@@ -1,45 +1,55 @@
 import * as cdk from 'aws-cdk-lib';
-import { aws_s3 as s3 } from 'aws-cdk-lib';
-import { aws_sns as sns } from 'aws-cdk-lib';
-import { aws_sns_subscriptions as subscriptions } from 'aws-cdk-lib';
+import { aws_dynamodb as dynamodb } from 'aws-cdk-lib';
 
 export interface SharedResourcesStackProps extends cdk.StackProps {
-    readonly adminEmailAddress: string;
+    readonly stage?: string;
 }
 
 export class SharedResourcesStack extends cdk.Stack {
      
-    // Properties to be made available to other stacks
-    public readonly rawDataBucket: s3.Bucket;
-    public readonly snsNotificationTopic: sns.Topic;
-    public readonly snsTopicCalculatorSummary: sns.Topic;
+    public readonly calculatedEnergyTable: dynamodb.Table;
 
     constructor(scope: cdk.App, id: string, props: SharedResourcesStackProps) {
         super(scope, id, props);
 
-        // S3 Bucket for raw data storage with L2 Construct
-        this.rawDataBucket = new s3.Bucket(this, 'RawDataBucket', {
+        const stage = props.stage ?? 'dev';
+
+        // Create DynamoDB Taable
+        this.calculatedEnergyTable = new dynamodb.Table(this, 'CalculatedEnergyTable', {
+            partitionKey: {
+                name: 'customerId',
+                type: dynamodb.AttributeType.STRING,
+            },
+            sortKey: {
+                name: 'timestamp',
+                type: dynamodb.AttributeType.STRING,
+            },
+            billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
-            autoDeleteObjects: true,
-            lifecycleRules: [{
-                expiration: cdk.Duration.days(1),
-            }],
+            timeToLiveAttribute: 'ttl',
+            pointInTimeRecoverySpecification: {
+                pointInTimeRecoveryEnabled: true,
+            },
         });
 
-        // SNS Topic for notifications
-        this.snsNotificationTopic = new sns.Topic(this, 'SnsTopicRawData', {
-            displayName: 'SNS Topic for Raw Data Notifications',
+        // Add GSI for location querying
+        this.calculatedEnergyTable.addGlobalSecondaryIndex({
+            indexName: 'CustomerLocationsIndex',
+            partitionKey: {
+                name: 'customerId',
+                type: dynamodb.AttributeType.STRING,
+            },
+            sortKey: {
+                name: 'location',
+                type: dynamodb.AttributeType.STRING,
+            },
+            projectionType: dynamodb.ProjectionType.ALL,
         });
 
-        // Add email subscription to the SNS topic
-        this.snsNotificationTopic.addSubscription(new subscriptions.EmailSubscription(props.adminEmailAddress));
-
-        // Create SNS Notification Topic for Calculator Summary
-        this.snsTopicCalculatorSummary = new sns.Topic(this, 'SnsTopicCalculatorSummary', {
-            displayName: 'SNS Topic for Calculator Summary',
+        // Add DynamoDB ouptut
+        new cdk.CfnOutput(this, 'CalculatedEnergyTableName', {
+            value: this.calculatedEnergyTable.tableName,
+            description: 'Calculated Energy Table Name',
         });
-
-        // Add email subscription to the Calculator Summary SNS topic
-        this.snsTopicCalculatorSummary.addSubscription(new subscriptions.EmailSubscription(props.adminEmailAddress));
     }
 }

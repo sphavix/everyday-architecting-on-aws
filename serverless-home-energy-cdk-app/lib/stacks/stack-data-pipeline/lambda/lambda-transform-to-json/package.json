@@ -1,0 +1,20 @@
+{
+  "name": "lambda-transform-to-json",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.901.0",
+    "@types/aws-lambda": "^8.10.153",
+    "aws-sdk": "^2.1692.0",
+    "csv-parse": "^6.1.0",
+    "csvtojson": "^2.0.10"
+  }
+}

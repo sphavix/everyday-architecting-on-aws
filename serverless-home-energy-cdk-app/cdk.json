@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/serverless-home-energy-cdk-ap.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/serverless-home-energy-cdk-app.ts",
   "watch": {
     "include": [
       "**"

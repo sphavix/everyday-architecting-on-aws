@@ -1,8 +1,8 @@
 {
-  "name": "serverless-home-energy-cdk-ap",
+  "name": "serverless-home-energy-cdk-app",
   "version": "0.1.0",
   "bin": {
-    "serverless-home-energy-cdk-ap": "bin/serverless-home-energy-cdk-ap.js"
+    "serverless-home-energy-cdk-ap": "bin/serverless-home-energy-cdk-app.js"
   },
   "scripts": {
     "build": "tsc",
